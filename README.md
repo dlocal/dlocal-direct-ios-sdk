@@ -1,6 +1,7 @@
 # DLDirectSDK for iOS
 
-Allows you to easily interact with dLocal API from an iOS project.
+- Allows easy integration with dLocal API to perform operations like card tokenization
+- Includes card utility methods, like card detection, validation and formatting
 
 ## Requirements
 - Xcode 13+
@@ -14,11 +15,10 @@ Add the following to your `Podfile`:
 pod 'DLDirectSDK'
 ```
 
-## How to use
+# Getting started
 
-### Create the SDK
+## Initialize the SDK
 
-##### Swift Sample
 ```swift 
 import DLDirectSDK
 
@@ -26,140 +26,389 @@ import DLDirectSDK
 class AppDelegate: UIResponder, UIApplicationDelegate {
     {...}
 
-    var sdk: DLDirect!
+    var tokenizer: DLCardTokenizer!
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-        sdk = DLDirectSDK(apiKey: "API KEY", countryCode: "COUNTRY CODE", testMode: true)
+        tokenizer = DLCardTokenizer(apiKey: "API KEY", countryCode: "COUNTRY CODE")
         return true
     }
-}
-```
-##### Objective-C Sample
-```objectivec
-#import "AppDelegate.h"
-@import DLDirectSDK;
-
-@interface AppDelegate ()
-@property (nonatomic, strong) DLDirect *sdk;
-@end
-
-@implementation AppDelegate
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    self.sdk = [[DLDirect alloc] initWithApiKey:@"API-KEY"
-									countryCode:@"COUNTRY CODE"
-									   testMode:YES];
-    return YES;
 }
 ```
 
 Replace `apiKey` with your key and `countryCode` with the two letter country code, for example "UY" for "Uruguay", or "US" for "United States".
 
-You can find full list of country codes [here](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
-
-Use `testMode` parameter to specify whether you are going to be doing testing with fake data or if you are going to be performing real transactions.
+You can find full list of country codes [here](https://documentation.dlocal.com/reference/country-reference).
 
 If your app is using SwiftUI and doesn't have a custom AppDelegate, put the equivalent code inside the init of the App struct like so:
 
-##### Swift
 ```swift 
 import DLDirectSDK
 
 @main
 struct ExampleApp: App {
 
-    let sdk: DLDirect
+    let tokenizer: DLCardTokenizer
 
     init() {
-        sdk = DLDirect(apiKey: "API KEY", countryCode: "COUNTRY CODE", testMode: true)
+        tokenizer = DLCardTokenizer(apiKey: "API-KEY", countryCode: "COUNTRY CODE", testMode: true)
     }
 }
 ```
 
-### Tokenize card
+## Testing the integration
 
-##### Swift Sample
+Use `testMode` parameter to specify whether you are going to be doing testing with fake data or if you are going to be performing real transactions.
+
+```swift
+tokenizer = DLCardTokenizer(apiKey: "API KEY", countryCode: "COUNTRY CODE", testMode: true)
+```
+
+## Objective-C compatibility
+
+All available functions of the SDK can be called from Objective-C code without additional effort on your side.
+
+# API 
+
+## Tokenize card
+
 ```swift
 let request = DLTokenizeRequest(holderName: "HOLDER-NAME",
                                 cardNumber: "CARD-NUMBER",
-                                cvv: "CVV",
-                                expirationMonth: "12",
-                                expirationYear: "2025")
+                                       cvv: "CVV",
+                           expirationMonth: "12",
+                            expirationYear: "2025")
 
-sdk.tokenizeCard(request: request, onSuccess: { [weak self] response in
+tokenizer.tokenizeCard(request: request, onSuccess: { response in
     print("Successfully tokenized card: \(response)")
-}, onError: { [weak self] error in
+}, onError: { error in
     print("Failed to tokenize card: \(error)")
 })
 ```
 
-##### Objective-C Sample
-```objectivec
-DLCardData *cardData = [[DLCardData alloc] initWithHolderName:@"HOLDER-NAME"
-												   cardNumber:@"CARD-NUMBER"
-														  cvv:@"CVV"
-											  expirationMonth:12
-											   expirationYear:2025];
-[sdk tokenizeCardWithCardData:cardData onSuccess:^(DLToken * _Nonnull response) {
-	NSLog(@"Successfully tokenized card: %@", response);
-} onError:^(DLError * _Nonnull error) {
-	NSLog(@"Failed to tokenize card: %@", error);
-}];
-```
+## Create Installments Plan
 
-### Create Installments Plan
-
-##### Swift Sample
 ```swift
-sdk.createInstallmentsPlan(cardNumber: "CARD-NUMBER",
-                           currencyCode: "CURRENCY-CODE",
-                           amount: 500,
-                           onSuccess: { [weak self] response in
+tokenizer.createInstallmentsPlan(cardNumber: "CARD-NUMBER",
+                               currencyCode: "CURRENCY-CODE",
+                                     amount: 500,
+                                  onSuccess: { response in
     print("Successfully created installments plan: \(response)")
-}, onError: { [weak self] error in
+}, onError: { error in
     print("Failed to create installments plan: \(error)")
 })
 ```
 
-##### Objective-C Sample
-```objectivec
-[sdk createInstallmentsPlanWithCardNumber:@"CARD-NUMBER"
-							 currencyCode:@"CURRENCY-CODE"
-								   amount:500
-								onSuccess:^(DLInstallments * _Nonnull response) {
-	NSLog(@"Successfully created installments plan: %@", response);
-} onError:^(DLError * _Nonnull error) {
-	NSLog(@"Failed to create installments plan: %@", error);
-}];
-```
+## Get Bin Information
 
-### Get Bin Information
-
-##### Swift Sample
 ```swift
-sdk.getBinInformation(cardNumber: "CARD-NUMBER", 
-                       onSuccess: { [weak self] response in
+tokenizer.getBinInformation(cardNumber: "CARD-NUMBER", 
+                             onSuccess: { response in
     print("Successfully obtained bin information: \(response)")
-}, onError: { [weak self] error in
+}, onError: { error in
     print("Failed to obtain bin information: \(error)")
 })
 ```
 
-##### Objective-C Sample
-```objectivec
-[sdk getBinInformationWithCardNumber:@"CARD-NUMBER"
-						   onSuccess:^(DLBinInfo * _Nonnull response) {
-	NSLog(@"Successfully obtained bin information: %@", response);
-} onError:^(DLError * _Nonnull error) {
-	NSLog(@"Failed to obtain bin information: %@", error);
-}];
+# Card Expert
+
+The card expert offers utility functions to work with cards, for example:
+
+- Detect the card brand from an incomplete card number
+- Validate the card number
+- Format card number to match what is displayed in the physical card
+
+## Getting started
+
+All interactions are done through the `DLCardExpert` class which you create as follows:
+
+```swift
+if let cardExpertForUruguay = DLCardExpert(countryCode: "UY") {
+    let supportedBrands = cardExpertForUruguay.allBrands.map({ $0.niceName })
+    print("Uruguay card data is available, the following brands are supported: \(supportedBrands)")
+} else {
+    print("Uruguay card data is unavailable")
+}
 ```
 
-## Report Issues
+For those countries that we don't have data for, you can still use a global expert as follows:
+
+```swift
+let cardExpert = DLCardExpert.global
+let supportedBrands = cardExpert.allBrands.map({ $0.niceName })
+print("Globally accepted brands: \(supportedBrands")
+```
+
+This global expert contains globally accepted cards like Visa and Mastercard among others.
+
+## Browse cards
+
+```swift
+// Iterate on all brands
+
+for brand in cardExpert.allBrands {
+    print("Brand name: \(brand.niceName)")
+}
+
+// Obtain a specific brand by identifier
+
+if let visa = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.visa) {
+    print(visa.identifier) // "visa"
+    print(visa.niceName) // "Visa"
+    print(visa.length) // [16]
+    print(visa.image) // https://static.dlocal.com/fields/input-icons/visa.svg
+} else {
+    print("Visa is not supported")
+}
+```
+
+## Brand detection
+
+```swift
+// Detect card brand from a complete card number
+cardExpert.detectBrand(cardNumber: "4242 4242 4242 4242") // returns [Visa]
+
+// Supports both formatted and raw card numbers
+cardExpert.detectBrand(cardNumber: "4242424242424242") // returns [Visa]
+
+// Detect card brand from an incomplete card number
+// In this case multiple card brands start with number "4", in order to find out which card is being entered user will need to enter additional numbers
+cardExpert.detectBrand(cardNumber: "4") // returns [Visa, Visa Débito, Maestro]
+
+// Cards that are not supported in Uruguay will return an empty collection
+// For example, American Express cards are not supported in Uruguay and "377400111111115" is a valid Amex card number
+cardExpert.detectBrand(cardNumber: "377400111111115") // returns []
+
+// Invalid values will return an empty collection
+cardExpert.detectBrand(cardNumber: "HELLO") // returns []
+
+// An empty card number will return all brands supported in this Uruguay
+cardExpert.detectBrand(cardNumber: "") // returns [Visa, Oca, Mastercard, Diners, Lider, Visa Débito, Mastercard Débito, Maestro]
+```
+
+## Validation
+
+### Possible results
+
+Validation of card fields can result in one of the following outcomes:
+
+- `potentiallyValid` meaning that the value entered is potentially valid but not yet valid, this means that by adding additional characters it could become valid
+- `valid` meaning that the value entered is valid
+- `invalid` meaning that the value entered is invalid and will never be valid by adding additional characters to it
+
+### Validate card number
+
+```swift
+cardExpert.validate(cardNumber: "") // returns .potentiallyValid
+cardExpert.validate(cardNumber: "4") // returns .potentiallyValid
+cardExpert.validate(cardNumber: "4242 4242 4242 4242") // returns .valid
+cardExpert.validate(cardNumber: "4242424242424242") // returns .valid
+
+cardExpert.validate(cardNumber: "4242424242424241") // returns .invalid (fails luhn check)
+cardExpert.validate(cardNumber: "4A") // returns .invalid
+```
+
+If you want to use your own card number validation rules:
+
+```swift
+let validator = DLCardNumberValidator(length: 16, // must have length of 16 digits 
+                                      patterns: [4, 5], // must start with 4 or 5
+                                      excludePatterns: "^(4242)", // should not match this regex
+                                      algorithm: .luhn) // use luhn check 
+cardExpert.validate(cardNumber: "4242 4242 4242 4242", validator: validator) // returns .invalid (as it starts with "4242")
+```
+
+### Validate expiration date
+
+```swift
+// Assume below calls are done on August 2022 (08/22)
+
+cardExpert.validate(expirationDate: "") // returns .potentiallyValid
+cardExpert.validate(expirationDate: "0") // returns .potentiallyValid
+cardExpert.validate(expirationDate: "02") // returns .potentiallyValid
+cardExpert.validate(expirationDate: "02/") // returns .potentiallyValid
+cardExpert.validate(expirationDate: "02/2") // returns .potentiallyValid
+cardExpert.validate(expirationDate: "02/26") // returns .valid
+cardExpert.validate(expirationDate: "2/26") // returns .valid
+
+
+cardExpert.validate(expirationDate: "13") // returns .invalid
+cardExpert.validate(expirationDate: "7/22") // returns .invalid (expired)
+cardExpert.validate(expirationDate: "8/2022") // returns .invalid
+```
+
+### Validate security code
+
+Different card brands have different rules for validating security codes, this is why this function will ask you to pass a card brand as parameter.
+
+```swift
+let brands = cardExpert.detectBrand(cardNumber: "4242 4242 4242 4242") // returns [Visa]
+
+cardExpert.validate(securityCode: "", brands: brands) // returns .potentiallyValid
+cardExpert.validate(securityCode: "1", brands: brands) // returns .potentiallyValid
+cardExpert.validate(securityCode: "12", brands: brands) // returns .potentiallyValid
+cardExpert.validate(securityCode: "123", brands: brands) // returns .valid
+
+cardExpert.validate(securityCode: "1234", brands: brands) // returns .invalid, security code for Visa cards are always of length three
+cardExpert.validate(securityCode: "12A", brands: brands) // returns .invalid, security codes for Visa cards can only contain numbers
+```
+
+If you want to allow input of security codes for any card that is valid in Uruguay:
+
+```swift
+if let cardExpertForUruguay = DLCardExpert(countryCode: "UY") {
+    cardExpert.validate(securityCode: "123", brands: cardExpertForUruguay.allBrands) // returns .valid
+    cardExpert.validate(securityCode: "1234", brands: cardExpertForUruguay.allBrands) // returns .invalid as there is no supported card in Uruguay that allows security code length of four digits
+}
+```
+
+Alternatively you can define your own validation rules:
+
+```swift
+let validator = DLSecurityCodeValidator(length: [5, 6])
+cardExpert.validate(securityCode: "1234", validator: validator) // returns .invalid as security code must be 5 or 6 digits length
+```
+
+## Formatting
+
+### Format card number
+
+Use this when users are typing in to the card field to facilitate the input of the card.
+
+```swift
+cardExpert.format(cardNumber: "") // returns ""
+cardExpert.format(cardNumber: "4") // returns "4"
+cardExpert.format(cardNumber: "42") // returns "42"
+cardExpert.format(cardNumber: "4242") // returns "4242" (Visa detected at this point)
+cardExpert.format(cardNumber: "42424") // returns "4242 4"
+cardExpert.format(cardNumber: "424242") // returns "4242 42"
+cardExpert.format(cardNumber: "4242424242424242") // returns "4242 4242 4242 4242"
+cardExpert.format(cardNumber: "42424242424242425") // returns "42424242424242425" (notice that extra "5" entered which makes input match no card brand)
+cardExpert.format(cardNumber: "42 42424242424242") // returns "4242 4242 4242 4242"
+cardExpert.format(cardNumber: "42 4242  42 42 4 2424    2") // returns "4242 4242 4242 4242"
+```
+
+If you want to use a specific brand to format the number, you can pass that brand to the function as follows:
+
+```swift
+if let diners = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.dinersClub) {
+    cardExpert.format(cardNumber: "12345678901234", brand: diners) // returns "1234 567890 1234"
+}
+```
+
+You can define your own formatter as follows:
+
+```swift
+let formatter = DLCardNumberFormatter(length: 16,
+                                        gaps: [1, 4]) 
+cardExpert.format(cardNumber: "1234567890", formatter: formatter) // returns "1 234 567890"
+```
+
+### Format card number with last numbers
+
+If you want to display a card identified by last numbers, you can use this option as follows:
+
+```swift
+if let diners = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.dinersClub) {
+    cardExpert.format(cardNumberEndingWith: "1234", brand: diners) // returns "**** ****** 1234"
+    cardExpert.format(cardNumberEndingWith: "234", brand: diners) // returns "**** ****** *234"
+    cardExpert.format(cardNumberEndingWith: "34", brand: diners) // returns "**** ****** **34"
+    cardExpert.format(cardNumberEndingWith: "4", brand: diners) // returns "**** ****** ***4"
+    cardExpert.format(cardNumberEndingWith: "", brand: diners) // returns "**** ****** ****"
+}
+```
+
+If you don't know the brand, you can use a `DLCardNumberMaskFormatter` instance as follows:
+
+```swift
+let formatter = DLCardNumberMaskFormatter(length: 14, gaps: [10])
+cardExpert.format(cardNumberEndingWith: "1234", formatter: formatter) // returns "********** 1234"
+```
+
+### Format expiration month and year (separated fields)
+
+If your form has separated fields for month and year, you will want to use these methods for formatting the input.
+Formatting includes normalization of values to match card formatting rules (e.g. turning "2" into "02") and some validation (e.g. disallow input of non numeric characters, disallow input of more than two characters for months, etc).
+
+```swift
+cardExpert.format(expirationMonth: "") // returns ""
+cardExpert.format(expirationMonth: "0") // returns "0"
+cardExpert.format(expirationMonth: "1") // returns "1" (as this could be "01", "11" or "12")
+cardExpert.format(expirationMonth: "2") // returns "02"
+cardExpert.format(expirationMonth: "3") // returns "03"
+cardExpert.format(expirationMonth: "4") // returns "04"
+cardExpert.format(expirationMonth: "5") // returns "05"
+cardExpert.format(expirationMonth: "6") // returns "06"
+cardExpert.format(expirationMonth: "7") // returns "07"
+cardExpert.format(expirationMonth: "8") // returns "08"
+cardExpert.format(expirationMonth: "9") // returns "09"
+cardExpert.format(expirationMonth: "10") // returns "10"
+cardExpert.format(expirationMonth: "11") // returns "11"
+cardExpert.format(expirationMonth: "12") // returns "12"
+
+cardExpert.format(expirationMonth: "121") // returns "12" (disallows entering a third character)
+cardExpert.format(expirationMonth: "13") // returns "13" (this is an invalid month so we cannot format it)
+cardExpert.format(expirationMonth: "1A") // returns "1" (does not allow entering non numeric characters)
+cardExpert.format(expirationMonth: "1 ") // returns "1" (does not allow spaces)
+```
+
+```swift
+cardExpert.format(expirationYear: "") // returns ""
+cardExpert.format(expirationYear: "0") // returns "" (does not allow first character to be a zero)
+cardExpert.format(expirationYear: "1") // returns "" (does not allow first character to be a one)
+cardExpert.format(expirationYear: "2") // returns "2"
+cardExpert.format(expirationYear: "20") // returns "20"
+cardExpert.format(expirationYear: "202") // returns "202" (allowed as user seems to be constructing four character year)
+cardExpert.format(expirationYear: "2022") // returns "22" (shortens length to match standard card expiration year formatting)
+cardExpert.format(expirationYear: "20225") // returns "22" (ignores everyhing coming after the fifth character)
+cardExpert.format(expirationYear: "202A") // returns "202" (does not allow entering non numeric characters)
+```
+
+### Format expiration month and year (same field)
+
+If your form contains a single field for expiration date then this is the function you want to use to format the input.
+Formatting includes normalization to help users with input of the expiration date, like automatically inserting a "/" to separate month and year.
+
+```swift
+cardExpert.format(expirationMonthAndYear: "") // returns ""
+cardExpert.format(expirationMonthAndYear: "1") // returns "1" (expecting a second number to understand whether this is month "01" or "11" or "12")
+cardExpert.format(expirationMonthAndYear: "11") // returns "11/" (automatically inserts "/" character so user only has to enter numbers)
+cardExpert.format(expirationMonthAndYear: "2") // returns "02/" (automatically formats into month "02" and inserts "/")
+cardExpert.format(expirationMonthAndYear: "2/") // returns "02/" (formats "2" into "02")
+cardExpert.format(expirationMonthAndYear: "2/A") // returns "02/" (disallows entering any non numeric character)
+cardExpert.format(expirationMonthAndYear: "2/2") // returns "02/2"
+cardExpert.format(expirationMonthAndYear: "2/20") // returns "02/20"
+cardExpert.format(expirationMonthAndYear: "2/202") // returns "02/202"
+cardExpert.format(expirationMonthAndYear: "2/2022") // returns "02/22" (shortens year)
+```
+
+### Format security code
+
+Different card brands have different rules for security code validation. This is why we ask you to input the brand for which you are formatting the code.
+
+```swift
+if let diners = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.dinersClub) {
+    cardExpert.format(securityCode: "", brand: diners) // returns ""
+    cardExpert.format(securityCode: "1", brand: diners) // returns "1"
+    cardExpert.format(securityCode: "12", brand: diners) // returns "12"
+    cardExpert.format(securityCode: "123", brand: diners) // returns "123"
+    cardExpert.format(securityCode: "1234", brand: diners) // returns "123" (security code limited to 3 characters for this brand)
+    cardExpert.format(securityCode: "12 ", brand: diners) // returns "12" (spaces are removed)
+    cardExpert.format(securityCode: "12A", brand: diners) // returns "12" (non numeric characters are removed)
+}
+```
+
+If you don't yet know the brand you can instead use a `DLSecurityCodeFormatter` as follows:
+
+```swift
+let securityCodeFormatter = DLSecurityCodeFormatter(length: [3, 4]) // Allow security codes of three or four numbers
+cardExpert.format(securityCode: "1234", formatter: securityCodeFormatter) // returns "1234"
+```
+
+# Report Issues
 If you have a problem or find an issue with the SDK please contact us at [mobile-dev@dlocal.com](mailto:mobile-dev@dlocal.com)
 
-## License
+# License
 
 ```text
 MIT License

@@ -188,24 +188,16 @@ cardExpert.detectBrand(cardNumber: "") // returns [Visa, Oca, Mastercard, Diners
 
 ## Validation
 
-### Possible results
-
-Validation of card fields can result in one of the following outcomes:
-
-- `potentiallyValid` meaning that the value entered is potentially valid but not yet valid, this means that by adding additional characters it could become valid
-- `valid` meaning that the value entered is valid
-- `invalid` meaning that the value entered is invalid and will never be valid by adding additional characters to it
-
 ### Validate card number
 
 ```swift
-cardExpert.validate(cardNumber: "") // returns .potentiallyValid
-cardExpert.validate(cardNumber: "4") // returns .potentiallyValid
-cardExpert.validate(cardNumber: "4242 4242 4242 4242") // returns .valid
-cardExpert.validate(cardNumber: "4242424242424242") // returns .valid
+cardExpert.validate(cardNumber: "") // false
+cardExpert.validate(cardNumber: "4") // false
+cardExpert.validate(cardNumber: "4242 4242 4242 4242") // true
+cardExpert.validate(cardNumber: "4242424242424242") // true
 
-cardExpert.validate(cardNumber: "4242424242424241") // returns .invalid (fails luhn check)
-cardExpert.validate(cardNumber: "4A") // returns .invalid
+cardExpert.validate(cardNumber: "4242424242424241") // false (fails luhn check)
+cardExpert.validate(cardNumber: "4A") // false
 ```
 
 If you want to use your own card number validation rules:
@@ -214,8 +206,8 @@ If you want to use your own card number validation rules:
 let validator = DLCardNumberValidator(length: 16, // must have length of 16 digits 
                                       patterns: [4, 5], // must start with 4 or 5
                                       excludePatterns: "^(4242)", // should not match this regex
-                                      algorithm: .luhn) // use luhn check 
-cardExpert.validate(cardNumber: "4242 4242 4242 4242", validator: validator) // returns .invalid (as it starts with "4242")
+                                      algorithm: .luhn) // should pass luhn check 
+cardExpert.validate(cardNumber: "4242 4242 4242 4242", validator: validator) // false (as it starts with "4242" which is a excluded pattern)
 ```
 
 ### Validate expiration date
@@ -223,50 +215,38 @@ cardExpert.validate(cardNumber: "4242 4242 4242 4242", validator: validator) // 
 ```swift
 // Assume below calls are done on August 2022 (08/22)
 
-cardExpert.validate(expirationDate: "") // returns .potentiallyValid
-cardExpert.validate(expirationDate: "0") // returns .potentiallyValid
-cardExpert.validate(expirationDate: "02") // returns .potentiallyValid
-cardExpert.validate(expirationDate: "02/") // returns .potentiallyValid
-cardExpert.validate(expirationDate: "02/2") // returns .potentiallyValid
-cardExpert.validate(expirationDate: "02/26") // returns .valid
-cardExpert.validate(expirationDate: "2/26") // returns .valid
+cardExpert.validate(expirationDate: "") // false
+cardExpert.validate(expirationDate: "0") // false
+cardExpert.validate(expirationDate: "02") // false
+cardExpert.validate(expirationDate: "02/") // false
+cardExpert.validate(expirationDate: "02/2") // false
+cardExpert.validate(expirationDate: "02/26") // true
+cardExpert.validate(expirationDate: "2/26") // true
 
 
-cardExpert.validate(expirationDate: "13") // returns .invalid
-cardExpert.validate(expirationDate: "7/22") // returns .invalid (expired)
-cardExpert.validate(expirationDate: "8/2022") // returns .invalid
+cardExpert.validate(expirationDate: "13") // false
+cardExpert.validate(expirationDate: "7/22") // false (expired)
+cardExpert.validate(expirationDate: "8/2022") // false
 ```
 
 ### Validate security code
 
-Different card brands have different rules for validating security codes, this is why this function will ask you to pass a card brand as parameter.
+The following will validate the security code using standard security code rules:
 
 ```swift
-let brands = cardExpert.detectBrand(cardNumber: "4242 4242 4242 4242") // returns [Visa]
-
-cardExpert.validate(securityCode: "", brands: brands) // returns .potentiallyValid
-cardExpert.validate(securityCode: "1", brands: brands) // returns .potentiallyValid
-cardExpert.validate(securityCode: "12", brands: brands) // returns .potentiallyValid
-cardExpert.validate(securityCode: "123", brands: brands) // returns .valid
-
-cardExpert.validate(securityCode: "1234", brands: brands) // returns .invalid, security code for Visa cards are always of length three
-cardExpert.validate(securityCode: "12A", brands: brands) // returns .invalid, security codes for Visa cards can only contain numbers
+cardExpert.validate(securityCode: "") // false
+cardExpert.validate(securityCode: "1") // false
+cardExpert.validate(securityCode: "12") // false
+cardExpert.validate(securityCode: "123") // true
 ```
 
-If you want to allow input of security codes for any card that is valid in Uruguay:
+If you know the brand of the card, you can validate the security code specifically for that brand:
 
-```swift
-if let cardExpertForUruguay = DLCardExpert(countryCode: "UY") {
-    cardExpert.validate(securityCode: "123", brands: cardExpertForUruguay.allBrands) // returns .valid
-    cardExpert.validate(securityCode: "1234", brands: cardExpertForUruguay.allBrands) // returns .invalid as there is no supported card in Uruguay that allows security code length of four digits
+```
+if let visa = cardExpert.detectBrand(cardNumber: "4242 4242 4242 4242").first {
+    cardExpert.validate(securityCode: "1234", brand: visa) // false, VISA security code length is 3
+    cardExpert.validate(securityCode: "12A", brand: visa) // false
 }
-```
-
-Alternatively you can define your own validation rules:
-
-```swift
-let validator = DLSecurityCodeValidator(length: [5, 6])
-cardExpert.validate(securityCode: "1234", validator: validator) // returns .invalid as security code must be 5 or 6 digits length
 ```
 
 ## Formatting
@@ -283,7 +263,7 @@ cardExpert.format(cardNumber: "4242") // returns "4242" (Visa detected at this p
 cardExpert.format(cardNumber: "42424") // returns "4242 4"
 cardExpert.format(cardNumber: "424242") // returns "4242 42"
 cardExpert.format(cardNumber: "4242424242424242") // returns "4242 4242 4242 4242"
-cardExpert.format(cardNumber: "42424242424242425") // returns "42424242424242425" (notice that extra "5" entered which makes input match no card brand)
+cardExpert.format(cardNumber: "42424242424242425") // returns "4242 4242 4242 4242" (we detect this is a VISA which length is 16 digits, so we ignore everything past the 16th position)
 cardExpert.format(cardNumber: "42 42424242424242") // returns "4242 4242 4242 4242"
 cardExpert.format(cardNumber: "42 4242  42 42 4 2424    2") // returns "4242 4242 4242 4242"
 ```
@@ -296,11 +276,10 @@ if let diners = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.dinersClu
 }
 ```
 
-You can define your own formatter as follows:
+Alternatively, you can define your own formatter as follows:
 
 ```swift
-let formatter = DLCardNumberFormatter(length: 16,
-                                        gaps: [1, 4]) 
+let formatter = DLCardNumberFormatter(length: 16, gaps: [1, 4]) 
 cardExpert.format(cardNumber: "1234567890", formatter: formatter) // returns "1 234 567890"
 ```
 
@@ -384,25 +363,34 @@ cardExpert.format(expirationMonthAndYear: "2/2022") // returns "02/22" (shortens
 
 ### Format security code
 
-Different card brands have different rules for security code validation. This is why we ask you to input the brand for which you are formatting the code.
+Different brands have different properties for the security code, if you know the brand you can use it for an improved formatting experience:
 
 ```swift
 if let diners = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.dinersClub) {
-    cardExpert.format(securityCode: "", brand: diners) // returns ""
-    cardExpert.format(securityCode: "1", brand: diners) // returns "1"
-    cardExpert.format(securityCode: "12", brand: diners) // returns "12"
     cardExpert.format(securityCode: "123", brand: diners) // returns "123"
     cardExpert.format(securityCode: "1234", brand: diners) // returns "123" (security code limited to 3 characters for this brand)
-    cardExpert.format(securityCode: "12 ", brand: diners) // returns "12" (spaces are removed)
-    cardExpert.format(securityCode: "12A", brand: diners) // returns "12" (non numeric characters are removed)
 }
 ```
 
-If you don't yet know the brand you can instead use a `DLSecurityCodeFormatter` as follows:
+When you don't know the brand of the card, you cand use the following version:
 
 ```swift
-let securityCodeFormatter = DLSecurityCodeFormatter(length: [3, 4]) // Allow security codes of three or four numbers
-cardExpert.format(securityCode: "1234", formatter: securityCodeFormatter) // returns "1234"
+cardExpert.format(securityCode: "") // returns ""
+cardExpert.format(securityCode: "1") // returns "1"
+cardExpert.format(securityCode: "12") // returns "12"
+cardExpert.format(securityCode: "123") // returns "123"
+cardExpert.format(securityCode: "1234") // returns "1234"
+cardExpert.format(securityCode: "12345") // returns "1234" // limits to 4 digits
+cardExpert.format(securityCode: " 1!2 3# 4a") // returns "1234" // removes letters and other unwanted characters
+```
+
+Alternatively if you want to use your custom formatting rules, you can use the following approach:
+
+```swift
+let formatter = DLSecurityCodeFormatter(maxLength: 5)
+cardExpert.format(securityCode: "1234", formatter: formatter) // returns "1234"
+cardExpert.format(securityCode: "12345", formatter: formatter) // returns "12345"
+cardExpert.format(securityCode: "123456", formatter: formatter) // returns "123456" // limits to 5 digits as defined
 ```
 
 # Report Issues

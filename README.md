@@ -86,29 +86,35 @@ tokenizer.tokenizeCard(request: request, onSuccess: { response in
 })
 ```
 
-## Create Installments Plan
-
-```swift
-tokenizer.createInstallmentsPlan(cardNumber: "CARD-NUMBER",
-                               currencyCode: "CURRENCY-CODE",
-                                     amount: 500,
-                                  onSuccess: { response in
-    print("Successfully created installments plan: \(response)")
-}, onError: { error in
-    print("Failed to create installments plan: \(error)")
-})
-```
-
 ## Get Bin Information
 
 ```swift
-tokenizer.getBinInformation(cardNumber: "CARD-NUMBER", 
-                             onSuccess: { response in
+tokenizer.getBinInformation(binNumber: "BIN-NUMBER", 
+                            onSuccess: { response in
     print("Successfully obtained bin information: \(response)")
 }, onError: { error in
     print("Failed to obtain bin information: \(error)")
 })
 ```
+
+## Get Bin Information + Create Installments Plan
+
+```swift
+tokenizer.getBinInformation(binNumber: "BIN-NUMBER",
+                         currencyCode: "CURRENCY-CODE",
+                               amount: 500,
+                            onSuccess: { response in
+    print("Successfully obtained bin information: \(response.bin) \(response.brand) \(response.type) \(response.country)")
+    if let installments = response.installments {
+        print("Successfully created installments: \(installments)")
+    } else {
+        print("Failed to create installments: \(response.installmentsError")
+    }
+}, onError: { error in
+    print("Failed to get bin info: \(error)")
+})
+```
+
 
 # Card Expert
 
@@ -187,6 +193,16 @@ cardExpert.detectBrand(cardNumber: "") // returns [Visa, Oca, Mastercard, Diners
 ```
 
 ## Validation
+
+### Validate holder name
+
+```swift
+cardExpert.validate(holderName: "John Doe") // true
+cardExpert.validate(holderName: "") // false
+cardExpert.validate(holderName: " ") // false
+cardExpert.validate(holderName: "John Doe 2") // false
+cardExpert.validate(holderName: "John Doe!") // false
+```
 
 ### Validate card number
 

@@ -168,6 +168,19 @@ if let visa = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.visa) {
 }
 ```
 
+## Get card image for a specific brand
+
+```swift
+let visa = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.visa)!
+let imageUrl = visa.cardImage(density: .x3, size: .small, background: true)
+
+if let imageUrl {
+    print("Visa image url for requested configuration: \(imageUrl)")                 
+} else {
+    print("Image url with requested configuration not available")
+}
+```
+
 ## Brand detection
 
 ```swift

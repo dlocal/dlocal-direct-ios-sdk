@@ -11,8 +11,8 @@
 
 Add the following to your `Podfile`:
 
-```
-pod 'DLDirectSDK'
+```ruby
+pod 'DLDirectSDK', '~> 0.2.10'
 ```
 
 # Getting started

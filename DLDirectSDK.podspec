@@ -1,10 +1,10 @@
 Pod::Spec.new do |spec|
     spec.name         = 'DLDirectSDK'
-    spec.version      = '0.2.9'
+    spec.version      = '0.2.10'
     spec.authors      = { 'dLocal' => 'mobile-dev@dlocal.com' }
     spec.homepage     = "https://github.com/dlocal/dlocal-direct-ios-sdk/"
-    spec.summary      = 'Wrapper for dLocal API'
-    spec.source       = { :http => "https://github.com/dlocal/dlocal-direct-ios-sdk/blob/#{spec.version.to_s}/DLDirectSDK.zip?raw=true" }
+    spec.summary      = 'dLocal Direct iOS SDK'
+    spec.source       = { :http => "https://github.com/dlocal/dlocal-direct-ios-sdk/releases/download/v#{spec.version.to_s}/DLDirectSDK-#{spec.version.to_s}.zip" }
     spec.license      = { :type => 'MIT', :file => 'LICENSE.md' }
     spec.platform     = :ios
     spec.ios.deployment_target = '13.0'

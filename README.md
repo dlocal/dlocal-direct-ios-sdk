@@ -4,7 +4,7 @@
 - Includes card utility methods, like card detection, validation and formatting
 
 ## Requirements
-- Xcode 13+
+- Xcode 14.1+
 - iOS 13+
 
 ## Installation
@@ -12,7 +12,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 0.2.10'
+pod 'DLDirectSDK', '~> SDK_VERSION'
 ```
 
 # Getting started
@@ -421,6 +421,10 @@ cardExpert.format(securityCode: "1234", formatter: formatter) // returns "1234"
 cardExpert.format(securityCode: "12345", formatter: formatter) // returns "12345"
 cardExpert.format(securityCode: "123456", formatter: formatter) // returns "123456" // limits to 5 digits as defined
 ```
+
+# API Reference
+
+[View documentation](https://dlocal.github.io/dlocal-direct-ios-sdk/documentation/dldirectsdk)
 
 # Report Issues
 If you have a problem or find an issue with the SDK please contact us at [mobile-dev@dlocal.com](mailto:mobile-dev@dlocal.com)

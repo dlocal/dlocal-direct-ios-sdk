@@ -12,7 +12,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 0.2.16'
+pod 'DLDirectSDK', '~> 0.2.17'
 ```
 
 # Getting started

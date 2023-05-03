@@ -12,7 +12,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 0.2.21'
+pod 'DLDirectSDK', '~> 0.2.22'
 ```
 
 # Getting started
@@ -424,7 +424,9 @@ cardExpert.format(securityCode: "123456", formatter: formatter) // returns "1234
 
 # API Reference
 
-[View documentation for 0.2.21](https://dlocal.github.io/dlocal-direct-ios-sdk/0.2.21/documentation/dldirectsdk)
+[View API Reference for DLDirectSDK v0.2.22](https://dlocal.github.io/dlocal-direct-ios-sdk/0.2.22/documentation/dldirectsdk).
+
+You can view reference for previous versions [here](https://dlocal.github.io/dlocal-direct-ios-sdk/).
 
 
 # Report Issues

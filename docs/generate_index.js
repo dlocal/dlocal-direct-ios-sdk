@@ -38,7 +38,7 @@ function compareVersions(a, b) {
 let html = '<!DOCTYPE html>\n<html>\n<head>\n<title>DLDirectSDK for iOS</title>\n</head>\n<body>\n<h1>API Reference</h1>\n<ul>\n';
 for (let i = 0; i < folders.length; i++) {
   const folder = folders[i];
-  html += `<li><a href="/${folder}/documentation/dldirectsdk">${folder}</a></li>\n`;
+  html += `<li><a href="${folder}/documentation/dldirectsdk">${folder}</a></li>\n`;
 }
 html += '</ul>\n</body>\n</html>';
 

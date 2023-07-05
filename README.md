@@ -12,7 +12,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 0.2.28'
+pod 'DLDirectSDK', '~> 0.2.29'
 ```
 
 # Getting started
@@ -26,11 +26,10 @@ import DLDirectSDK
 class AppDelegate: UIResponder, UIApplicationDelegate {
     {...}
 
-    var tokenizer: DLCardTokenizer!
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-        tokenizer = DLCardTokenizer(apiKey: "API KEY", countryCode: "COUNTRY CODE")
+        DLDirect.initialize(apiKey: "API KEY", countryCode: "COUNTRY CODE", testMode: false)
+
         return true
     }
 }
@@ -40,6 +39,8 @@ Replace `apiKey` with your key and `countryCode` with the two letter country cod
 
 You can find full list of country codes [here](https://documentation.dlocal.com/reference/country-reference).
 
+Use `testMode` to define whether you will be performing real transactions (pass `false`) or you will be testing with fake data (pass `true`).
+
 If your app is using SwiftUI and doesn't have a custom AppDelegate, put the equivalent code inside the init of the App struct like so:
 
 ```swift 
@@ -47,28 +48,25 @@ import DLDirectSDK
 
 @main
 struct ExampleApp: App {
-
-    let tokenizer: DLCardTokenizer
-
     init() {
-        tokenizer = DLCardTokenizer(apiKey: "API-KEY", countryCode: "COUNTRY CODE", testMode: true)
+        DLDirect.initialize(apiKey: "API KEY", countryCode: "COUNTRY CODE", testMode: false)
     }
 }
-```
-
-## Testing the integration
-
-Use `testMode` parameter to specify whether you are going to be doing testing with fake data or if you are going to be performing real transactions.
-
-```swift
-tokenizer = DLCardTokenizer(apiKey: "API KEY", countryCode: "COUNTRY CODE", testMode: true)
 ```
 
 ## Objective-C compatibility
 
 All available functions of the SDK can be called from Objective-C code without additional effort on your side.
 
-# API 
+# Tokenizer
+
+## Create an instance
+
+All interactions with the tokenizer are performed through the DLCardTokenizer instance:
+
+```swift
+let tokenizer = DLCardTokenizer()
+```
 
 ## Tokenize card
 
@@ -115,7 +113,6 @@ tokenizer.getBinInformation(binNumber: "BIN-NUMBER",
 })
 ```
 
-
 # Card Expert
 
 The card expert offers utility functions to work with cards, for example:
@@ -129,23 +126,10 @@ The card expert offers utility functions to work with cards, for example:
 All interactions are done through the `DLCardExpert` class which you create as follows:
 
 ```swift
-if let cardExpertForUruguay = DLCardExpert(countryCode: "UY") {
-    let supportedBrands = cardExpertForUruguay.allBrands.map({ $0.niceName })
-    print("Uruguay card data is available, the following brands are supported: \(supportedBrands)")
-} else {
-    print("Uruguay card data is unavailable")
-}
+let cardExpertForUruguay = DLCardExpert(countryCode: "UY")
+let supportedBrands = cardExpertForUruguay.allBrands.map({ $0.niceName })
+print("Uruguay card data is available, the following brands are supported: \(supportedBrands)")
 ```
-
-For those countries that we don't have data for, you can still use a global expert as follows:
-
-```swift
-let cardExpert = DLCardExpert.global
-let supportedBrands = cardExpert.allBrands.map({ $0.niceName })
-print("Globally accepted brands: \(supportedBrands")
-```
-
-This global expert contains globally accepted cards like Visa and Mastercard among others.
 
 ## Browse cards
 
@@ -422,9 +406,45 @@ cardExpert.format(securityCode: "12345", formatter: formatter) // returns "12345
 cardExpert.format(securityCode: "123456", formatter: formatter) // returns "123456" // limits to 5 digits as defined
 ```
 
+# Card Sync
+
+This library comes bundled with a list of supported cards by country. When this list is updated (e.g. we add support for Amex in Uruguay) you'll have to pull the latest version of the library (which comes bundled with this new card) and deploy a new version of your app. 
+
+You can use our Sync feature to get OTA updates and bypass this limitation.
+
+### How it works
+
+```
+// Use the `isSyncing` to observe updates in the process
+
+let subscription = DLCardSync.isSyncing.sink { isSyncing in
+    if isSyncing {
+        print("Syncing started")
+    } else {
+        print("Syncing ended")
+    }
+}
+
+// Initiate the syncing process
+
+DLCardSync.sync()
+```
+
+We recommend you attach this code previous to using any of the card expert functionalities.
+
+### Debugging
+
+Use `DLCardSync.syncLog` to get logs from the sync process.
+Also you can use `DLCardSync.lastSyncDate` to get the latest date when synchronization was completed.
+
+### Important: You need to opt-in to Sync
+
+This feature is OFF by default. You'll have to manually initiate the sync process.
+
+
 # API Reference
 
-[View API Reference for DLDirectSDK v0.2.28](https://dlocal.github.io/dlocal-direct-ios-sdk/0.2.28/documentation/dldirectsdk).
+[View API Reference for DLDirectSDK v0.2.29](https://dlocal.github.io/dlocal-direct-ios-sdk/0.2.29/documentation/dldirectsdk).
 
 You can view reference for previous versions [here](https://dlocal.github.io/dlocal-direct-ios-sdk/).
 

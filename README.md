@@ -9,11 +9,19 @@
 
 ## Installation
 
+### Cocoapods
+
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 0.2.30'
+pod 'DLDirectSDK', '~> 0.2.31'
 ```
+
+### Manual
+
+1. Download the latest release from [here](https://github.com/dlocal/dlocal-direct-ios-sdk/releases).
+2. Drag and drop the downloaded `DLDirectSDK.xcframework` into the project.
+3. Go to your project configuration General tab and ensure that `Embed & Sign` is selected for `DLDirectSDK`.
 
 # Getting started
 
@@ -444,7 +452,7 @@ This feature is OFF by default. You'll have to manually initiate the sync proces
 
 # API Reference
 
-[View API Reference for DLDirectSDK v0.2.30](https://dlocal.github.io/dlocal-direct-ios-sdk/0.2.30/documentation/dldirectsdk).
+[View API Reference for DLDirectSDK v0.2.31](https://dlocal.github.io/dlocal-direct-ios-sdk/0.2.31/documentation/dldirectsdk).
 
 You can view reference for previous versions [here](https://dlocal.github.io/dlocal-direct-ios-sdk/).
 

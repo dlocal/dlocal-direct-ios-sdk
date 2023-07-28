@@ -8,16 +8,15 @@ function generateRedirectHTML(version) {
         <title>Redirecting...</title>
         <script>
             window.onload = function() {
-                var currentUrl = window.location.href;
-                var redirectUrl = currentUrl.replace('latest/index.html', '${version}/documentation/dldirectsdk/');
-                redirectUrl = currentUrl.replace('latest', '${version}/documentation/dldirectsdk/');
-                window.location.href = redirectUrl;
+                setTimeout(function() {
+                    window.location.href = "https://dlocal.github.io/dlocal-direct-ios-sdk/${version}/documentation/dldirectsdk";
+                }, 3000);
             };
         </script>
     </head>
     <body>
         <h1>Redirecting...</h1>
-        <p>If you are not redirected automatically, <a href="https://dlocal.github.io/dlocal-direct-ios-sdk/${version}/documentation/dldirectsdk/">click here</a>.</p>
+        <p>If you are not redirected automatically, <a href="https://dlocal.github.io/dlocal-direct-ios-sdk/${version}/documentation/dldirectsdk">click here</a>.</p>
     </body>
     </html>`;
 

@@ -4,6 +4,7 @@ const fs = require('fs');
 const folders = fs.readdirSync('.', { withFileTypes: true })
   .filter(dirent => dirent.isDirectory())
   .map(dirent => dirent.name)
+  .filter(dirname => dirname != "latest")
   .sort((a, b) => {
     const aVersion = getVersionNumber(a);
     const bVersion = getVersionNumber(b);

@@ -14,7 +14,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 0.2.42'
+pod 'DLDirectSDK', '~> 0.2.43'
 ```
 
 ### Manual
@@ -452,7 +452,7 @@ This feature is OFF by default. You'll have to manually initiate the sync proces
 
 # API Reference
 
-[View API Reference for DLDirectSDK v0.2.42](https://dlocal.github.io/dlocal-direct-ios-sdk/0.2.42/documentation/dldirectsdk).
+[View API Reference for DLDirectSDK v0.2.43](https://dlocal.github.io/dlocal-direct-ios-sdk/0.2.43/documentation/dldirectsdk).
 
 You can view reference for previous versions [here](https://dlocal.github.io/dlocal-direct-ios-sdk/).
 

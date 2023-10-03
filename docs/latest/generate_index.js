@@ -8,9 +8,7 @@ function generateRedirectHTML(version) {
         <title>Redirecting...</title>
         <script>
             window.onload = function() {
-                setTimeout(function() {
-                    window.location.href = "https://dlocal.github.io/dlocal-direct-ios-sdk/${version}/documentation/dldirectsdk";
-                }, 3000);
+                window.location.href = "https://dlocal.github.io/dlocal-direct-ios-sdk/${version}/documentation/dldirectsdk";
             };
         </script>
     </head>

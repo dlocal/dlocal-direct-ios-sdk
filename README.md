@@ -14,7 +14,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 0.2.45'
+pod 'DLDirectSDK', '~> 1.0.0'
 ```
 
 ### Swift Package Manager
@@ -456,7 +456,7 @@ This feature is OFF by default. You'll have to manually initiate the sync proces
 
 # API Reference
 
-[View API Reference for DLDirectSDK v0.2.45](https://dlocal.github.io/dlocal-direct-ios-sdk/0.2.45/documentation/dldirectsdk).
+[View API Reference for DLDirectSDK v1.0.0](https://dlocal.github.io/dlocal-direct-ios-sdk/1.0.0/documentation/dldirectsdk).
 
 You can view reference for previous versions [here](https://dlocal.github.io/dlocal-direct-ios-sdk/).
 

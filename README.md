@@ -14,7 +14,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 1.0.0'
+pod 'DLDirectSDK', '~> 1.0.1'
 ```
 
 ### Swift Package Manager
@@ -276,6 +276,12 @@ if let visa = cardExpert.detectBrand(cardNumber: "4242 4242 4242 4242").first {
 
 ## Formatting
 
+### Format holder name
+
+```swift
+cardExpert.format(cardNumber: "John Smith") // returns "JOHN SMITH"
+```
+
 ### Format card number
 
 Use this when users are typing in to the card field to facilitate the input of the card.
@@ -456,7 +462,7 @@ This feature is OFF by default. You'll have to manually initiate the sync proces
 
 # API Reference
 
-[View API Reference for DLDirectSDK v1.0.0](https://dlocal.github.io/dlocal-direct-ios-sdk/1.0.0/documentation/dldirectsdk).
+[View API Reference for DLDirectSDK v1.0.1](https://dlocal.github.io/dlocal-direct-ios-sdk/1.0.1/documentation/dldirectsdk).
 
 You can view reference for previous versions [here](https://dlocal.github.io/dlocal-direct-ios-sdk/).
 

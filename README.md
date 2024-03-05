@@ -14,7 +14,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 1.0.1'
+pod 'DLDirectSDK', '~> 2.0.0'
 ```
 
 ### Swift Package Manager
@@ -29,46 +29,15 @@ In Xcode, go to `File > Add Packages...` and paste this repo URL (https://github
 
 # Getting started
 
-## Initialize the SDK
-
-```swift 
-import DLDirectSDK
-
-@main
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    {...}
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
-        DLDirect.initialize(apiKey: "API KEY", countryCode: "COUNTRY CODE", testMode: false)
-
-        return true
-    }
-}
-```
-
-Replace `apiKey` with your key and `countryCode` with the two letter country code, for example "UY" for "Uruguay", or "US" for "United States".
-
-You can find full list of country codes [here](https://documentation.dlocal.com/reference/country-reference).
-
-Use `testMode` to define whether you will be performing real transactions (pass `false`) or you will be testing with fake data (pass `true`).
-
-If your app is using SwiftUI and doesn't have a custom AppDelegate, put the equivalent code inside the init of the App struct like so:
-
-```swift 
-import DLDirectSDK
-
-@main
-struct ExampleApp: App {
-    init() {
-        DLDirect.initialize(apiKey: "API KEY", countryCode: "COUNTRY CODE", testMode: false)
-    }
-}
-```
-
 ## Objective-C compatibility
 
 All available functions of the SDK can be called from Objective-C code without additional effort on your side.
+
+# Import Library
+
+```swift
+import DLDirectSDK
+```
 
 # Tokenizer
 
@@ -77,17 +46,23 @@ All available functions of the SDK can be called from Objective-C code without a
 All interactions with the tokenizer are performed through the DLCardTokenizer instance:
 
 ```swift
-let tokenizer = DLCardTokenizer()
+let tokenizer = DLCardTokenizer(apiKey: "YOUR-API-KEY", countryCode: "US", testMode: true)
 ```
+
+Replace `apiKey` with your provided key. **Important:** you should have been provided with two keys, one for sandbox (testMode=true) and another for production (testMode=false).  
+
+You can find full list of country codes [here](https://documentation.dlocal.com/reference/country-reference). 
+
+Use `testMode` to define whether you will be performing real transactions (pass `false`) or you will be testing with fake data (pass `true`).
 
 ## Tokenize card
 
 ```swift
-let request = DLTokenizeRequest(holderName: "HOLDER-NAME",
-                                cardNumber: "CARD-NUMBER",
-                                       cvv: "CVV",
-                           expirationMonth: "12",
-                            expirationYear: "2025")
+let request = DLTokenizeRequest(holderName: "JOHN SMITH",
+                                cardNumber: "4242424242424242",
+                                cvv: "CVV",
+                                expirationMonth: "12",
+                                expirationYear: "2027")
 
 tokenizer.tokenizeCard(request: request, onSuccess: { response in
     print("Successfully tokenized card: \(response)")
@@ -99,7 +74,7 @@ tokenizer.tokenizeCard(request: request, onSuccess: { response in
 ## Get Bin Information
 
 ```swift
-tokenizer.getBinInformation(binNumber: "BIN-NUMBER", 
+tokenizer.getBinInformation(binNumber: "411111",
                             onSuccess: { response in
     print("Successfully obtained bin information: \(response)")
 }, onError: { error in
@@ -110,9 +85,9 @@ tokenizer.getBinInformation(binNumber: "BIN-NUMBER",
 ## Get Bin Information + Create Installments Plan
 
 ```swift
-tokenizer.getBinInformation(binNumber: "BIN-NUMBER",
-                         currencyCode: "CURRENCY-CODE",
-                               amount: 500,
+tokenizer.getBinInformation(binNumber: "411111",
+                            currencyCode: "USD",
+                            amount: 500,
                             onSuccess: { response in
     print("Successfully obtained bin information: \(response.bin) \(response.brand) \(response.type) \(response.country)")
     if let installments = response.installments {
@@ -138,10 +113,13 @@ The card expert offers utility functions to work with cards, for example:
 All interactions are done through the `DLCardExpert` class which you create as follows:
 
 ```swift
-let cardExpertForUruguay = DLCardExpert(countryCode: "UY")
+let cardExpertForUruguay = DLCardExpert(countryCode: "UY", testMode: false)
 let supportedBrands = cardExpertForUruguay.allBrands.map({ $0.niceName })
 print("Uruguay card data is available, the following brands are supported: \(supportedBrands)")
 ```
+
+If you use the card sync feature (more details on that below), the `testMode` will define what local database for card data you will be reading from (sandbox or production). 
+If you don't use card sync feature, you can safely pass `testMode=true` for all situations.
 
 ## Browse cards
 
@@ -225,16 +203,6 @@ cardExpert.validate(cardNumber: "4242424242424241") // false (fails luhn check)
 cardExpert.validate(cardNumber: "4A") // false
 ```
 
-If you want to use your own card number validation rules:
-
-```swift
-let validator = DLCardNumberValidator(length: 16, // must have length of 16 digits 
-                                      patterns: [4, 5], // must start with 4 or 5
-                                      excludePatterns: "^(4242)", // should not match this regex
-                                      algorithm: .luhn) // should pass luhn check 
-cardExpert.validate(cardNumber: "4242 4242 4242 4242", validator: validator) // false (as it starts with "4242" which is a excluded pattern)
-```
-
 ### Validate expiration date
 
 ```swift
@@ -274,12 +242,19 @@ if let visa = cardExpert.detectBrand(cardNumber: "4242 4242 4242 4242").first {
 }
 ```
 
+Finally if you want to validate the code for a set of known brands:
+
+```
+let visaMasterAmex = expert.allBrands.filter { [DLCardBrandIdentifier.visa, .mastercard, .americanExpress].contains($0.identifier) }
+cardExpert.validate(securityCode: "1234", brands: [visaMasterAmex]) // true, AMEX accepts 4 digits
+```
+
 ## Formatting
 
 ### Format holder name
 
 ```swift
-cardExpert.format(cardNumber: "John Smith") // returns "JOHN SMITH"
+cardExpert.format(holderName: "John Smith") // returns "JOHN SMITH"
 ```
 
 ### Format card number
@@ -307,13 +282,6 @@ if let diners = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.dinersClu
 }
 ```
 
-Alternatively, you can define your own formatter as follows:
-
-```swift
-let formatter = DLCardNumberFormatter(length: 16, gaps: [1, 4]) 
-cardExpert.format(cardNumber: "1234567890", formatter: formatter) // returns "1 234 567890"
-```
-
 ### Format card number with last numbers
 
 If you want to display a card identified by last numbers, you can use this option as follows:
@@ -326,13 +294,6 @@ if let diners = cardExpert.brand(withIdentifier: DLCardBrandIdentifier.dinersClu
     cardExpert.format(cardNumberEndingWith: "4", brand: diners) // returns "**** ****** ***4"
     cardExpert.format(cardNumberEndingWith: "", brand: diners) // returns "**** ****** ****"
 }
-```
-
-If you don't know the brand, you can use a `DLCardNumberMaskFormatter` instance as follows:
-
-```swift
-let formatter = DLCardNumberMaskFormatter(length: 14, gaps: [10])
-cardExpert.format(cardNumberEndingWith: "1234", formatter: formatter) // returns "********** 1234"
 ```
 
 ### Format expiration month and year (separated fields)
@@ -415,37 +376,25 @@ cardExpert.format(securityCode: "12345") // returns "1234" // limits to 4 digits
 cardExpert.format(securityCode: " 1!2 3# 4a") // returns "1234" // removes letters and other unwanted characters
 ```
 
-Alternatively if you want to use your custom formatting rules, you can use the following approach:
-
-```swift
-let formatter = DLSecurityCodeFormatter(maxLength: 5)
-cardExpert.format(securityCode: "1234", formatter: formatter) // returns "1234"
-cardExpert.format(securityCode: "12345", formatter: formatter) // returns "12345"
-cardExpert.format(securityCode: "123456", formatter: formatter) // returns "123456" // limits to 5 digits as defined
-```
-
 # Card Sync
 
 This library comes bundled with a list of supported cards by country. When this list is updated (e.g. we add support for Amex in Uruguay) you'll have to pull the latest version of the library (which comes bundled with this new card) and deploy a new version of your app. 
 
 You can use our Sync feature to get OTA updates and bypass this limitation.
 
-### How it works
+### How to it works
 
 ```
-// Use the `isSyncing` to observe updates in the process
+let cardSync = DLCardSync(apiKey: "YOUR-API-KEY", testMode: true)
 
-let subscription = DLCardSync.isSyncing.sink { isSyncing in
-    if isSyncing {
-        print("Syncing started")
-    } else {
-        print("Syncing ended")
-    }
+let result = await cardSync.sync()
+
+switch result {
+    case .success: 
+        print("Card sync completed successfully")
+    case .failure(let error): 
+        print("Card sync failed: \(error)")
 }
-
-// Initiate the syncing process
-
-DLCardSync.sync()
 ```
 
 We recommend you attach this code previous to using any of the card expert functionalities.
@@ -457,12 +406,20 @@ Also you can use `DLCardSync.lastSyncDate` to get the latest date when synchroni
 
 ### Important: You need to opt-in to Sync
 
-This feature is OFF by default. You'll have to manually initiate the sync process.
+This feature is OFF by default. You'll have to manually initiate the sync process, we recomment to do so right before making use of the `DLCardExpert` class.
 
+```swift
+let cardSync = DLCardSync(apiKey: "YOUR-API-KEY", testMode: false)
+_ = await cardSync.sync()
+
+// The following instance will be guaranteed to have the latest available card data read from our remote server
+
+let cardExpert = DLCardExpert(countryCode: "US", testMode: false)
+```
 
 # API Reference
 
-[View API Reference for DLDirectSDK v1.0.1](https://dlocal.github.io/dlocal-direct-ios-sdk/1.0.1/documentation/dldirectsdk).
+[View API Reference for DLDirectSDK v2.0.0](https://dlocal.github.io/dlocal-direct-ios-sdk/2.0.0/documentation/dldirectsdk).
 
 You can view reference for previous versions [here](https://dlocal.github.io/dlocal-direct-ios-sdk/).
 

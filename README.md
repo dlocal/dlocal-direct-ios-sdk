@@ -4,8 +4,8 @@
 - Includes card utility methods, like card detection, validation and formatting
 
 ## Requirements
-- Xcode 14.1+
-- iOS 13+
+- Xcode 15 or greater
+- iOS 13 or greater
 
 ## Installation
 
@@ -14,7 +14,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 2.0.0'
+pod 'DLDirectSDK', '~> 2.0.1'
 ```
 
 ### Swift Package Manager
@@ -419,7 +419,7 @@ let cardExpert = DLCardExpert(countryCode: "US", testMode: false)
 
 # API Reference
 
-[View API Reference for DLDirectSDK v2.0.0](https://dlocal.github.io/dlocal-direct-ios-sdk/2.0.0/documentation/dldirectsdk).
+[View API Reference for DLDirectSDK v2.0.1](https://dlocal.github.io/dlocal-direct-ios-sdk/2.0.1/documentation/dldirectsdk).
 
 You can view reference for previous versions [here](https://dlocal.github.io/dlocal-direct-ios-sdk/).
 

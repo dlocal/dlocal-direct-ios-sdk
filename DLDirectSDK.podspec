@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name         = 'DLDirectSDK'
-    spec.version      = '3.0.10'
+    spec.version      = '3.0.12'
     spec.authors      = { 'dLocal' => 'mobile-dev@dlocal.com' }
     spec.homepage     = "https://github.com/dlocal/dlocal-direct-ios-sdk/"
     spec.summary      = 'dLocal Direct iOS SDK'

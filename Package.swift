@@ -16,8 +16,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "DLDirectSDK",
-            url: "https://github.com/dlocal/dlocal-direct-ios-sdk/releases/download/v2.1.0/DLDirectSDK-2.1.0.zip",
-            checksum: "32641f325719f5e1b1f7a7108bcc91debe45816367747695c4ea990d04d6e590"
+            url: "https://github.com/dlocal/dlocal-direct-ios-sdk/releases/download/v4.0.0/DLDirectSDK-4.0.0.zip",
+            checksum: "9d84868f260e6bbc9870bc9d71181240d5198cd5f7bbc22bb723df3bf9de6180"
         )
     ]
 )

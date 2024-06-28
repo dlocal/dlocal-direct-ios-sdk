@@ -14,7 +14,7 @@
 Add the following to your `Podfile`:
 
 ```ruby
-pod 'DLDirectSDK', '~> 2.1.0'
+pod 'DLDirectSDK', '~> 4.0.0'
 ```
 
 ### Swift Package Manager
@@ -419,7 +419,7 @@ let cardExpert = DLCardExpert(countryCode: "US", testMode: false)
 
 # API Reference
 
-[View API Reference for DLDirectSDK v2.1.0](https://dlocal.github.io/dlocal-direct-ios-sdk/2.1.0/documentation/dldirectsdk).
+[View API Reference for DLDirectSDK v4.0.0](https://dlocal.github.io/dlocal-direct-ios-sdk/4.0.0/documentation/dldirectsdk).
 
 You can view reference for previous versions [here](https://dlocal.github.io/dlocal-direct-ios-sdk/).
 
